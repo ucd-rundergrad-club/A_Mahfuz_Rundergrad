@@ -1,0 +1,50 @@
+---
+title: "week_3"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Chapter 4
+
+#### Notes
+
+ - surround entire ssignment with () to make an assignment and print to screen
+ 
+ - enviroment shows all assignments made
+
+#### 4.4 Practice
+
+ 1. Why does this code not work?
+ 
+```{r}
+my_variable <- 10
+my_varıable
+```
+
+This code doesn't work becuase in the second line, the character i in my_varıable doesn't match the character i in the first line. 
+
+ 2. Tweak each of the following R commands so that they run correctly:
+ 
+```{r}
+library(tidyverse)
+
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy))
+
+filter(mpg, cyl == 8)
+filter(diamonds, carat > 3)
+```
+
+ 3. Press Alt + Shift + K. What happens? How can you get to the same place using the menus?
+
+It takes you to a menu with keyboard shortcuts. Keyboard shortcuts can also be found under tools in the menu. 
+
+### Chapter 5
+
+#### Notes 
+
