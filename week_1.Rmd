@@ -8,6 +8,8 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+### Hi! You need to pull to see this text in your R studio.
+
 
 ## Swirl Tutoriol Notes
 
