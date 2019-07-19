@@ -19,16 +19,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #### 4.4 Practice
 
- 1. Why does this code not work?
+1. Why does this code not work?
  
-```{r}
 my_variable <- 10
 my_varıable
-```
 
 This code doesn't work becuase in the second line, the character i in my_varıable doesn't match the character i in the first line. 
 
- 2. Tweak each of the following R commands so that they run correctly:
+2. Tweak each of the following R commands so that they run correctly:
  
 ```{r}
 library(tidyverse)
@@ -40,11 +38,233 @@ filter(mpg, cyl == 8)
 filter(diamonds, carat > 3)
 ```
 
- 3. Press Alt + Shift + K. What happens? How can you get to the same place using the menus?
+3. Press Alt + Shift + K. What happens? How can you get to the same place using the menus?
 
 It takes you to a menu with keyboard shortcuts. Keyboard shortcuts can also be found under tools in the menu. 
 
 ### Chapter 5
 
 #### Notes 
+
+ - types of variables:
+  - int stands for integers
+  - dbl stands for doubles, or real number
+  - chr stands for character vectors, or string
+  - dttm stands for date-times (a date + a time)
+  - lgl stands for logical, vectors that contain only TRUE or FALSE
+  - fctr stands for factors, which R uses to represent categorical variables with fixed possible values
+  - date stands for dates.
+ 
+ - dplyr functions:
+ 
+  - Pick observations by their values (filter())
+   - x %in% y will select every row where x is one of the values in y; ex. nov_dec <- filter(flights, month %in% c(11, 12))
+   - !(x & y) is the same as !x | !y, and !(x | y) is the same as !x & !y
+   - only includes observations that are TRUE; explicitly ask for values that are NA or FALSE
+   
+  - Reorder the rows (arrange())
+   - changes order of rows from smallest value to largest
+   - use desc() to re-order by a column in descending order
+   - if you list multiple columns, the proceeding column will be used as a tie breaker
+   - NA is always at the end
+   
+  - Pick variables by their names (select())
+   - starts_with("abc"): matches names that begin with “abc”
+   - ends_with("xyz"): matches names that end with “xyz”
+   - contains("ijk"): matches names that contain “ijk”
+   - matches("(.)\\1"): selects variables that match a regular expression. This one matches any variables that contain repeated characters. You’ll learn more about regular expressions in strings
+   - num_range("x", 1:3): matches x1, x2 and x3
+   - use rename() to rename variables
+   - use everything() in select() to move variables to front of dataset
+
+  - Create new variables with functions of existing variables (mutate())
+   - to keep only new variables, use transmute() 
+   - %/% (integer division), discards the remainder
+   - %% (remainder)
+  
+  - Collapse many values down to a single summary (summarise())
+  
+  - group_by() changes the scope of function from entire dataset to group 
+  
+ - how verbs work:
+  1. first argument is dataset
+  2. subsequent arguments are variables and what to do with them 
+  
+#### 5.2.4 Exercises
+
+1.1. Find all flights that had an arrival delay of two or more hours.
+ 
+```{r}
+library(nycflights13)
+filter(flights, arr_delay >= 120)
+```
+ 
+1.4. Find all flights that departed in summer (July, August, and September).
+ 
+```{r}
+filter(flights, month <= 9, month >= 7)
+```
+ 
+1.5. Find all flights that arrived more than two hours late, but didn’t leave late. 
+ 
+```{r}
+ filter(flights, arr_delay >= 120, dep_delay <= 0)
+```
+
+**1.7 Find all flights that departed between midnight and 6am (inclusive).**
+ 
+```{r}
+filter(flights, dep_time == 2400 | dep_time <= 600)
+```
+ 
+2. Another useful dplyr filtering helper is between(). What does it do? Can you use it to simplify the code needed to answer the previous challenges?
+ 
+between() is a shortcut for x >= left & x <= right. You can simplify the statement _departed in the summer_.
+
+```{r}
+filter(flights, between(month, 7, 9))
+```
+
+3. How many flights have a missing dep_time? What other variables are missing? What might these rows represent?
+ 
+```{r}
+filter(flights, is.na(dep_time))
+```
+
+Other variables that are missing are arr_time for these rows. This means that these flights probably got cancelled. 
+
+#### 5.3.1 Exercises 
+
+1. How could you use arrange() to sort all missing values to the start? (Hint: use is.na()).
+
+```{}
+arrange(flights, desc(is.na(dep_time)), dep_time)
+```
+
+Use is.na to determine whether the variable is NA or not. If it is missing, then it will be listed first because the statement is TRUE and TRUE > FALSE. 
+
+2. Sort flights to find the most delayed flights. Find the flights that left earliest.
+
+most delayed flights:
+```{}
+arrange(flights, desc(dep_delay))
+```
+
+earliest flights:
+```{}
+arrange(flights, dep_delay)
+```
+
+**3. Sort flights to find the fastest flights.**
+
+```{}
+fastest_flights <- mutate(flights, mph = distance / air_time * 60)
+fastest_flights <- select(fastest_flights, mph, distance, air_time,flight, origin, dest, year, month, day)
+arrange(fastest_flights, desc(mph))
+```
+
+4. Which flights travelled the longest? Which travelled the shortest?
+
+longest flight:
+```{}
+arrange(flights, desc(distance))
+```
+
+shortest flight:
+```{}
+arrange(flights, distance)
+```
+
+#### 5.4.1 Exercises
+
+1. Brainstorm as many ways as possible to select dep_time, dep_delay, arr_time, and arr_delay from flights.
+
+```{}
+select(flights, dep_time, dep_delay, arr_time, arr_delay)
+```
+
+```{}
+select(flights, "dep_time", "dep_delay", "arr_time", "arr_delay")
+```
+
+```{}
+select(flights, starts_with("dep_"), starts_with("arr_"))
+```
+
+2. What happens if you include the name of a variable multiple times in a select() call?
+
+```{}
+select(flights, dep_time, dep_time, arr_time)
+```
+
+There is no error or any toruble printing the function. 
+
+3. What does the one_of() function do? Why might it be helpful in conjunction with this vector?
+
+```{}
+vars <- c("year", "month", "day", "dep_delay", "arr_delay")
+```
+
+The one_of function matches varaible names in a character vector. It would be helpful becuase instead of writing out seperate arguments for each character variable, you could write out the variable name like this:
+
+```{}
+select(flights, one_of(vars))
+```
+
+4. Does the result of running the following code surprise you? How do the select helpers deal with case by default? How can you change that default?
+
+```{}
+select(flights, contains("TIME"))
+```
+
+It is surprising that contains() ignores case as R doesn't ignore case. To deal with this default, you can change it by using ignore.case = FALSE in you contains() function. 
+
+** 5.5.2 Exercises **
+
+1. Currently dep_time and sched_dep_time are convenient to look at, but hard to compute with because they’re not really continuous numbers. Convert them to a more convenient representation of number of minutes since midnight.
+
+```{}
+flights_time <- mutate(flights, dep_time_mins = (dep_time %/% 100 * 60 + dep_time %% 100) %% 1440, sched_dep_time_mins = (sched_dep_time %/% 100 * 60 + sched_dep_time %% 100) %% 1440)
+select(flights_time, dep_time, sched_dep_time, dep_time_mins, sched_dep_time)
+```
+
+**DON'T UNDERSTAND THE MATH, READ 5.1.1.!**
+
+2. Compare air_time with arr_time - dep_time. What do you expect to see? What do you see? What do you need to do to fix it? 
+
+I expect that air_time = arr_time - dep_time. 
+
+```{}
+mutate(flights, dep_time = (dep_time %/% 100 * 60 + dep_time %% 100) %% 1440, arr_time = (arr_time %/% 100 * 60 + arr_time %% 100) %% 1440,)
+nrow(filter(flights, arr_time_diff))
+```
+
+There should be no flights where air_time_diff doesn't equal 0, but there are. This means that there are flights where time zones were changed or the dep_time was greater than arr_time. I don't know how to fix it. 
+
+3. Compare dep_time, sched_dep_time, and dep_delay. How would you expect those three numbers to be related?
+
+I expect dep_delay = dep_time - sched_dep_time, but like the previous question there will be discrepencies due to the dep_time and sched_dep_time being on different days. 
+
+4. Find the 10 most delayed flights using a ranking function. How do you want to handle ties? Carefully read the documentation for min_rank(). 
+
+```{}
+flights_delayed <- mutate(flights, dep_delay_min_rank = min_rank(desc(dep_delay)))
+flights_delayed <- (filter(flights_delayed, !(dep_delay_min_rank >10)))
+flights_delayed <- arrange(flights_delayed, dep_delay, dep_delay_min_rank)
+select(flights_delayed, dep_delay, dep_delay_min_rank)
+```
+
+To handle ties, you can use dense_rank(). 
+
+5. What does 1:3 + 1:10 return? Why?
+
+```{}
+1:3 + 1:10 
+```
+
+When adding two vectors, the code recylces the shorter one to match the length of the longer one. 
+
+6. What trigonometric functions does R provide?
+
+R provides sin(), tan(), cos(), sinpi(), cospi(), tanpi(), acos(), asin(), atan(), and atan2().
 
