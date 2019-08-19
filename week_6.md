@@ -438,3 +438,12 @@ who2 %>%
 
 ![](week_6_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
+#### Joins Tutorial Notes
+ - when using join functions, first two arguments are the tables that we want to join and the third argument species which column(s) contain the keys
+  - inner_join() only keeps rows where the key is present in both data sets 
+  - left_join() keeps all rows from the left data set and keeps rows from the right data set where there is a key that matches the left
+  - There is an analogous right_join
+  - full_join() keeps all rows from left or right, regardless of whether or not there is a matching key
+  - if the key columns have different names in the two data sets, then in 3rd argument, do by = c("first name" = "second name")
+  
+
